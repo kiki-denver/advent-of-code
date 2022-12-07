@@ -2,16 +2,12 @@ input = INPUT.chars.freeze
 
 def find_marker(input, look_back)
   input.each_index do |i|
-    message = input.slice(i-(look_back-1), look_back)
+    message = input.slice(i - (look_back - 1), look_back)
     uniq_message = message.uniq
-    if i < (look_back - 1)
-      next
-    elsif message.length != uniq_message.length
-      next
-    else
-      return (i + 1)
-    end
+    return (i + 1) unless i < (look_back - 1) || message.length != uniq_message.length
   end
+
+  return 0
 end
 
 solve!(
