@@ -1,7 +1,8 @@
 require "tree"
 
 input = INPUT.split("\n").freeze
-DIRECTORY_PREFIX = "dir "
+DIRECTORY_PREFIX = "dir ".freeze
+
 def new_directory(name)
   # assign directories am initial size of 0
   Tree::TreeNode.new(name, 0)
@@ -47,18 +48,16 @@ def build_filesystem(input)
 
       # go until the end of the file and/or directory listing(s)
       while type != "$"
-
-        if type == "d" # it's a directory
+        # it's a directory
+        if type == "d"
           dir_name = item
           # if it's the first time we're seeing the directory, add it to the filesystem
           current_directory[dir_name] ? current_directory[dir_name] : current_directory << new_directory(dir_name)
-        elsif type.to_i != 0 # it's a file, starting with the size
+        # if it's a file, it will start with it's size
+        elsif type.to_i != 0
           file_size_s, file_name = *item.split
           # if it's the first time we're seeing the file, add it to the filesystem
-          if current_directory[file_name].nil?
-            new_file_update_directory_sizes(file_name, file_size_s.to_i, current_directory)
-          end
-          # current_directory[file_name] ? current_directory[file_name] : new_file_update_directory_sizes(file_name, file_size, current_directory)
+          new_file_update_directory_sizes(file_name, file_size_s.to_i, current_directory) if current_directory[file_name].nil?
         end
 
         i += 1
@@ -76,12 +75,21 @@ def sum_of_directories_at_most(total_size, root_node)
   end.sum
 end
 
+def directory_to_delete(total_disk_space, update_space_req, root_node)
+  unused_space_needed = update_space_req - (total_disk_space - root_node.content)
+  options = []
+  root_node.each do |node|
+    options << node.content if node.name.start_with?(DIRECTORY_PREFIX) && unused_space_needed <= node.content
+  end
+  options.min
+end
+
 solve!(
   "The sum of directories with a total size of at most 100000:",
   sum_of_directories_at_most(100000, build_filesystem(input)),
 )
 
 solve!(
-  ":",
-  0,
+  "The size of the smallest directory to delete to free up enough space:",
+  directory_to_delete(70_000_000, 30_000_000, build_filesystem(input)),
 )

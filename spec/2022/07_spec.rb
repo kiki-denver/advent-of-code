@@ -41,7 +41,7 @@ RSpec.describe "Day 7: No Space Left On Device" do
   describe "Part Two" do
     let(:solution) { runner.execute!(input, part: 2) }
     it "" do
-      expect(solution).to eq(0)
+      expect(solution).to eq(24933642)
     end
   end
 end
